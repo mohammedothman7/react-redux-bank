@@ -2,30 +2,35 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import {} from '../store/reducers/bankReducer';
+import {
+  depositFiftyActionCreator,
+  depositOneHundredActionCreator,
+  withdrawFiftyActionCreator,
+  withdrawOneHundredActionCreator,
+} from '../store/reducers/bankReducer';
 
 // Component
-function Atm() {
+function Atm(props) {
   return (
-    <div className="atm">
-      <div className="terminal">
-        <h1 className="balance">$ 0</h1>
+    <div className='atm'>
+      <div className='terminal'>
+        <h1 className='balance'>$ {props.balance}</h1>
       </div>
 
-      <div className="terminal">
-        <button type="button" onClick={() => console.log('Deposit $ 50')}>
+      <div className='terminal'>
+        <button type='button' onClick={() => props.depositFiftyAction()}>
           Deposit $ 50
         </button>
 
-        <button type="button" onClick={() => console.log('Withdraw $ 50')}>
+        <button type='button' onClick={() => props.withdrawFiftyAction()}>
           Withdraw $ 50
         </button>
 
-        <button type="button" onClick={() => console.log('Deposit $ 100')}>
+        <button type='button' onClick={() => props.depositOneHundredAction()}>
           Deposit $ 100
         </button>
 
-        <button type="button" onClick={() => console.log('Withdraw $ 100')}>
+        <button type='button' onClick={() => props.withdrawOneHundredAction()}>
           Withdraw $ 100
         </button>
       </div>
@@ -34,20 +39,32 @@ function Atm() {
 }
 
 // Container
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   console.log('state in mapStateToProps: ', state);
 
-  return {};
+  return {
+    balance: state.bank.balance,
+  };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   console.log('dispatch in mapDispatchToProps: ', dispatch);
 
-  return {};
+  return {
+    depositFiftyAction() {
+      dispatch(depositFiftyActionCreator());
+    },
+    depositOneHundredAction() {
+      dispatch(depositOneHundredActionCreator());
+    },
+    withdrawFiftyAction() {
+      dispatch(withdrawFiftyActionCreator());
+    },
+    withdrawOneHundredAction() {
+      dispatch(withdrawOneHundredActionCreator());
+    },
+  };
 };
 // Please refactor mapStateToProps and mapDispatchToProps into implicitly returning functions rather than explicitly returning ones once you get everything up and running
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Atm);
+export default connect(mapStateToProps, mapDispatchToProps)(Atm);
