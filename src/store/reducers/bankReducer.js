@@ -5,25 +5,37 @@ const initialState = {
 
 // Actions Types
 const DEPOSIT_FIFTY = 'DEPOSIT_FIFTY';
-const DEPOSIT_ONE_HUNDRED = 'DEPOSIT_ONE_HUNDRED';
+const DEPOSIT_HUNDRED = 'DEPOSIT_HUNDRED';
 const WITHDRAW_FIFTY = 'WITHDRAW_FIFTY';
-const WITHDRAW_ONE_HUNDRED = 'WITHDRAW_ONE_HUNDRED';
+const WITHDRAW_HUNDRED = 'WITHDRAW_HUNDRED';
+const DEPOSIT_CUSTOM_AMOUNT = 'DEPOSIT_CUSTOM_AMOUNT';
+const WITHDRAW_CUSTOM_AMOUNT = 'WITHDRAW_CUSTOM_AMOUNT';
 
 // Action Creators
 export const depositFiftyActionCreator = () => ({
   type: DEPOSIT_FIFTY,
 });
 
-export const depositOneHundredActionCreator = () => ({
-  type: DEPOSIT_ONE_HUNDRED,
+export const depositHundredActionCreator = () => ({
+  type: DEPOSIT_HUNDRED,
+});
+
+export const depositCustomAmountActionCenter = (customAmount) => ({
+  type: DEPOSIT_CUSTOM_AMOUNT,
+  customAmount,
 });
 
 export const withdrawFiftyActionCreator = () => ({
   type: WITHDRAW_FIFTY,
 });
 
-export const withdrawOneHundredActionCreator = () => ({
-  type: WITHDRAW_ONE_HUNDRED,
+export const withdrawHundredActionCreator = () => ({
+  type: WITHDRAW_HUNDRED,
+});
+
+export const withdrawCustomAmountActionCreator = (customAmount) => ({
+  type: WITHDRAW_CUSTOM_AMOUNT,
+  customAmount,
 });
 
 // Reducer
@@ -36,10 +48,16 @@ const bankReducer = (state = initialState, action) => {
         balance: state.balance + 50,
       };
 
-    case DEPOSIT_ONE_HUNDRED:
+    case DEPOSIT_HUNDRED:
       return {
         ...state,
         balance: state.balance + 100,
+      };
+
+    case DEPOSIT_CUSTOM_AMOUNT:
+      return {
+        ...state,
+        balance: state.balance + action.customAmount,
       };
 
     case WITHDRAW_FIFTY:
@@ -48,10 +66,16 @@ const bankReducer = (state = initialState, action) => {
         balance: state.balance - 50,
       };
 
-    case WITHDRAW_ONE_HUNDRED:
+    case WITHDRAW_HUNDRED:
       return {
         ...state,
         balance: state.balance - 100,
+      };
+
+    case WITHDRAW_CUSTOM_AMOUNT:
+      return {
+        ...state,
+        balance: state.balance - action.customAmount,
       };
 
     default:
