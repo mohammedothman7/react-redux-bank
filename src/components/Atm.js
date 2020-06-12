@@ -59,7 +59,7 @@ class Atm extends Component {
       this.props.convertCurrencyThunk('EUR', 'USD');
     }
 
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       sourceCurrency: prevState.targetCurrency,
       targetCurrency: prevState.sourceCurrency,
@@ -86,62 +86,62 @@ class Atm extends Component {
     } = this.props;
 
     return (
-      <div className="atm">
-        <div className="terminal">
-          <h1 className="balance">
+      <div className='atm'>
+        <div className='terminal'>
+          <h1 className='balance'>
             {sourceCurrency} {balance.toFixed(2)}
           </h1>
 
-          <button type="button" onClick={this.handleConvert}>
+          <button type='button' onClick={this.handleConvert}>
             <span>Convert to </span>
 
-            <span className="text-style-bold">{targetCurrency}</span>
+            <span className='text-style-bold'>{targetCurrency}</span>
           </button>
         </div>
 
-        <div className="terminal">
+        <div className='terminal'>
           <button
-            type="button"
+            type='button'
             onClick={() => depositFiftyAction(sourceCurrency)}
           >
             Deposit {sourceCurrency} 50
           </button>
 
           <button
-            type="button"
+            type='button'
             onClick={() => withdrawFiftyAction(sourceCurrency)}
           >
             Withdraw {sourceCurrency} 50
           </button>
 
           <button
-            type="button"
+            type='button'
             onClick={() => depositHundredAction(sourceCurrency)}
           >
             Deposit {sourceCurrency} 100
           </button>
 
           <button
-            type="button"
+            type='button'
             onClick={() => withdrawHundredAction(sourceCurrency)}
           >
             Withdraw {sourceCurrency} 100
           </button>
         </div>
 
-        <div className="terminal">
-          <div className="custom-amount-container">
+        <div className='terminal'>
+          <div className='custom-amount-container'>
             <input
-              className="custom-amount-containee"
-              type="text"
-              placeholder="Enter Custom Amount"
+              className='custom-amount-containee'
+              type='text'
+              placeholder='Enter Custom Amount'
               required
               onChange={this.handleChange}
             />
           </div>
 
           <button
-            type="button"
+            type='button'
             disabled={disabledCustomAmount}
             onClick={() =>
               depositCustomAmountAction(sourceCurrency, customAmount)
@@ -151,7 +151,7 @@ class Atm extends Component {
           </button>
 
           <button
-            type="button"
+            type='button'
             disabled={disabledCustomAmount}
             onClick={() =>
               withdrawCustomAmountAction(sourceCurrency, customAmount)
@@ -162,12 +162,12 @@ class Atm extends Component {
         </div>
 
         {invalidCustomAmount ? (
-          <div className="terminal">
+          <div className='terminal'>
             Invalid Custom Amount! Please Try Again.
           </div>
         ) : null}
 
-        <div className="terminal">
+        <div className='terminal'>
           {transactions && transactions.length ? (
             <table>
               <thead>
@@ -180,12 +180,24 @@ class Atm extends Component {
               </thead>
 
               <tbody>
-                {transactions.map((transaction, idx) => (
-                  <tr key={idx}>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Balance</th>
+                {transactions.map((transaction) => (
+                  <tr key={transaction.date}>
+                    <th>{moment(transaction.date).format('L')}</th>
+                    <th>{transaction.type}</th>
+                    <th>
+                      {transaction.type === 'Deposit'
+                        ? `+${
+                            transaction.currency
+                          } ${transaction.amount.toFixed(2)}`
+                        : transaction.type === 'Withdraw'
+                        ? `-${
+                            transaction.currency
+                          } ${transaction.amount.toFixed(2)}`
+                        : `${transaction.amount}`}
+                    </th>
+                    <th>{`${transaction.currency} ${transaction.balance.toFixed(
+                      2
+                    )}`}</th>
                   </tr>
                 ))}
               </tbody>
@@ -200,12 +212,12 @@ class Atm extends Component {
 }
 
 // Container
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   balance: state.bank.balance,
   transactions: state.bank.transactions,
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   depositFiftyAction(sourceCurrency) {
     dispatch(depositFiftyActionCreator(sourceCurrency));
   },
@@ -242,7 +254,4 @@ Atm.propTypes = {
   convertCurrencyThunk: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Atm);
+export default connect(mapStateToProps, mapDispatchToProps)(Atm);

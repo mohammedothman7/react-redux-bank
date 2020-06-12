@@ -19,12 +19,12 @@ const WITHDRAW_CUSTOM_AMOUNT = 'WITHDRAW_CUSTOM_AMOUNT';
 const CONVERT_CURRENCY = 'CONVERT_CURRENCY';
 
 // Action Creators
-export const depositFiftyActionCreator = sourceCurrency => ({
+export const depositFiftyActionCreator = (sourceCurrency) => ({
   type: DEPOSIT_FIFTY,
   sourceCurrency,
 });
 
-export const depositHundredActionCreator = sourceCurrency => ({
+export const depositHundredActionCreator = (sourceCurrency) => ({
   type: DEPOSIT_HUNDRED,
   sourceCurrency,
 });
@@ -38,12 +38,12 @@ export const depositCustomAmountActionCreator = (
   customAmount,
 });
 
-export const withdrawFiftyActionCreator = sourceCurrency => ({
+export const withdrawFiftyActionCreator = (sourceCurrency) => ({
   type: WITHDRAW_FIFTY,
   sourceCurrency,
 });
 
-export const withdrawHundredActionCreator = sourceCurrency => ({
+export const withdrawHundredActionCreator = (sourceCurrency) => ({
   type: WITHDRAW_HUNDRED,
   sourceCurrency,
 });
@@ -70,7 +70,7 @@ export const convertCurrencyActionCreator = (
 
 // Thunk Creators
 export const convertCurrencyThunkCreator = (sourceCurrency, targetCurrency) => {
-  return async dispatch => {
+  return async (dispatch) => {
     try {
       const { data } = await axios.get(
         `https://cors-anywhere.herokuapp.com/https://www.freeforexapi.com/api/live?pairs=${sourceCurrency}${targetCurrency}`
@@ -98,49 +98,114 @@ const bankReducer = (state = initialState, action) => {
       return {
         ...state,
         balance: state.balance + 50,
-        transactions: [],
+        transactions: [
+          {
+            date: Date.now(),
+            type: 'Deposit',
+            amount: 50,
+            balance: state.balance + 50,
+            currency: action.sourceCurrency,
+          },
+          ...state.transactions,
+        ],
       };
 
     case DEPOSIT_HUNDRED:
       return {
         ...state,
         balance: state.balance + 100,
-        transactions: [],
+        transactions: [
+          {
+            date: Date.now(),
+            type: 'Deposit',
+            amount: 100,
+            balance: state.balance + 100,
+            currency: action.sourceCurrency,
+          },
+          ...state.transactions,
+        ],
       };
 
     case DEPOSIT_CUSTOM_AMOUNT:
       return {
         ...state,
         balance: state.balance + action.customAmount,
-        transactions: [],
+        transactions: [
+          {
+            date: Date.now(),
+            type: 'Deposit',
+            amount: action.customAmount,
+            balance: state.balance + action.customAmount,
+            currency: action.sourceCurrency,
+          },
+          ...state.transactions,
+        ],
       };
 
     case WITHDRAW_FIFTY:
       return {
         ...state,
         balance: state.balance - 50,
-        transactions: [],
+        transactions: [
+          {
+            date: Date.now(),
+            type: 'Withdraw',
+            amount: 50,
+            balance: state.balance - 50,
+            currency: action.sourceCurrency,
+          },
+          ...state.transactions,
+        ],
       };
 
     case WITHDRAW_HUNDRED:
       return {
         ...state,
         balance: state.balance - 100,
-        transactions: [],
+        transactions: [
+          {
+            date: Date.now(),
+            type: 'Withdraw',
+            amount: 100,
+            balance: state.balance - 100,
+            currency: action.sourceCurrency,
+          },
+          ...state.transactions,
+        ],
       };
 
     case WITHDRAW_CUSTOM_AMOUNT:
       return {
         ...state,
         balance: state.balance - action.customAmount,
-        transactions: [],
+        transactions: [
+          {
+            date: Date.now(),
+            type: 'Withdraw',
+            amount: action.customAmount,
+            balance: state.balance - action.customAmount,
+            currency: action.sourceCurrency,
+          },
+          ...state.transactions,
+        ],
       };
 
     case CONVERT_CURRENCY:
       return {
         ...state,
         balance: state.balance * action.conversionRate,
-        transactions: [],
+        transactions: [
+          {
+            date: Date.now(),
+            type: `Conversion (${action.sourceCurrency} to ${action.targetCurrency})`,
+            amount: `${action.conversionRate.toFixed(2)} ${
+              action.sourceCurrency
+            } / 1 ${action.targetCurrency}`,
+            balance: state.balance * action.conversionRate,
+            currency: action.targetCurrency === 'USD' ? '$' : '€',
+          },
+          ...state.transactions,
+        ],
       };
 
     default:
