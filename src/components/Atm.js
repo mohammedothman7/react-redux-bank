@@ -1,14 +1,16 @@
 // Imports
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import {
+  depositCustomAmountActionCreator,
   depositFiftyActionCreator,
   depositHundredActionCreator,
-  depositCustomAmountActionCreator,
+  withdrawCustomAmountActionCreator,
   withdrawFiftyActionCreator,
   withdrawHundredActionCreator,
-  withdrawCustomAmountActionCreator,
   convertCurrencyThunkCreator,
 } from '../store/reducers/bankReducer';
 
@@ -57,137 +59,190 @@ class Atm extends Component {
       this.props.convertCurrencyThunk('EUR', 'USD');
     }
 
-    // Make sure you swap the sourceCurrency and targetCurrency every time you convert.
-    this.setState((prevState) => {
-      console.log({ prevState });
-
-      return {
-        ...prevState,
-        sourceCurrency: prevState.targetCurrency,
-        targetCurrency: prevState.sourceCurrency,
-      };
-    });
+    this.setState(prevState => ({
+      ...prevState,
+      sourceCurrency: prevState.targetCurrency,
+      targetCurrency: prevState.sourceCurrency,
+    }));
   }
 
   render() {
+    const {
+      sourceCurrency,
+      targetCurrency,
+      customAmount,
+      invalidCustomAmount,
+      disabledCustomAmount,
+    } = this.state;
+    const {
+      balance,
+      transactions,
+      depositFiftyAction,
+      depositHundredAction,
+      depositCustomAmountAction,
+      withdrawFiftyAction,
+      withdrawHundredAction,
+      withdrawCustomAmountAction,
+    } = this.props;
+
     return (
-      <div className='atm'>
-        <div className='terminal'>
-          <h1 className='balance'>
-            {this.state.sourceCurrency} {this.props.balance.toFixed(2)}
+      <div className="atm">
+        <div className="terminal">
+          <h1 className="balance">
+            {sourceCurrency} {balance.toFixed(2)}
           </h1>
 
-          <button type='button' onClick={this.handleConvert}>
+          <button type="button" onClick={this.handleConvert}>
             <span>Convert to </span>
 
-            <span className='text-style-bold'>{this.state.targetCurrency}</span>
+            <span className="text-style-bold">{targetCurrency}</span>
           </button>
         </div>
 
-        <div className='terminal'>
-          <button type='button' onClick={() => this.props.depositFiftyAction()}>
-            Deposit {this.state.sourceCurrency} 50
+        <div className="terminal">
+          <button
+            type="button"
+            onClick={() => depositFiftyAction(sourceCurrency)}
+          >
+            Deposit {sourceCurrency} 50
           </button>
 
           <button
-            type='button'
-            onClick={() => this.props.withdrawFiftyAction()}
+            type="button"
+            onClick={() => withdrawFiftyAction(sourceCurrency)}
           >
-            Withdraw {this.state.sourceCurrency} 50
+            Withdraw {sourceCurrency} 50
           </button>
 
           <button
-            type='button'
-            onClick={() => this.props.depositHundredAction()}
+            type="button"
+            onClick={() => depositHundredAction(sourceCurrency)}
           >
-            Deposit {this.state.sourceCurrency} 100
+            Deposit {sourceCurrency} 100
           </button>
 
           <button
-            type='button'
-            onClick={() => this.props.withdrawHundredAction()}
+            type="button"
+            onClick={() => withdrawHundredAction(sourceCurrency)}
           >
-            Withdraw {this.state.sourceCurrency} 100
+            Withdraw {sourceCurrency} 100
           </button>
         </div>
 
-        <div className='terminal'>
-          <div className='custom-amount-container'>
+        <div className="terminal">
+          <div className="custom-amount-container">
             <input
-              className='custom-amount-containee'
-              type='text'
-              placeholder='Enter Custom Amount'
+              className="custom-amount-containee"
+              type="text"
+              placeholder="Enter Custom Amount"
               required
-              onChange={(event) => this.handleChange(event)}
+              onChange={this.handleChange}
             />
           </div>
 
           <button
-            type='button'
-            disabled={this.state.disabledCustomAmount}
+            type="button"
+            disabled={disabledCustomAmount}
             onClick={() =>
-              this.props.depositCustomAmountAction(this.state.customAmount)
+              depositCustomAmountAction(sourceCurrency, customAmount)
             }
           >
-            Deposit $
+            Deposit {sourceCurrency}
           </button>
 
           <button
-            type='button'
-            disabled={this.state.disabledCustomAmount}
+            type="button"
+            disabled={disabledCustomAmount}
             onClick={() =>
-              this.props.withdrawCustomAmountAction(this.state.customAmount)
+              withdrawCustomAmountAction(sourceCurrency, customAmount)
             }
           >
-            Withdraw $
+            Withdraw {sourceCurrency}
           </button>
         </div>
 
-        {this.state.invalidCustomAmount ? (
-          <div className='terminal'>
+        {invalidCustomAmount ? (
+          <div className="terminal">
             Invalid Custom Amount! Please Try Again.
           </div>
         ) : null}
+
+        <div className="terminal">
+          {transactions && transactions.length ? (
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Balance</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {transactions.map((transaction, idx) => (
+                  <tr key={idx}>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Balance</th>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div>No transactions were found.</div>
+          )}
+        </div>
       </div>
     );
   }
 }
 
 // Container
-const mapStateToProps = (state) => {
-  console.log('state in mapStateToProps: ', state);
+const mapStateToProps = state => ({
+  balance: state.bank.balance,
+  transactions: state.bank.transactions,
+});
 
-  return {
-    balance: state.bank.balance,
-  };
+const mapDispatchToProps = dispatch => ({
+  depositFiftyAction(sourceCurrency) {
+    dispatch(depositFiftyActionCreator(sourceCurrency));
+  },
+  depositHundredAction(sourceCurrency) {
+    dispatch(depositHundredActionCreator(sourceCurrency));
+  },
+  depositCustomAmountAction(sourceCurrency, customAmount) {
+    dispatch(depositCustomAmountActionCreator(sourceCurrency, customAmount));
+  },
+  withdrawFiftyAction(sourceCurrency) {
+    dispatch(withdrawFiftyActionCreator(sourceCurrency));
+  },
+  withdrawHundredAction(sourceCurrency) {
+    dispatch(withdrawHundredActionCreator(sourceCurrency));
+  },
+  withdrawCustomAmountAction(sourceCurrency, customAmount) {
+    dispatch(withdrawCustomAmountActionCreator(sourceCurrency, customAmount));
+  },
+  convertCurrencyThunk(sourceCurrency, targetCurrency) {
+    dispatch(convertCurrencyThunkCreator(sourceCurrency, targetCurrency));
+  },
+});
+
+// Prop Types
+Atm.propTypes = {
+  balance: PropTypes.number,
+  transactions: PropTypes.array,
+  depositFiftyAction: PropTypes.func,
+  depositHundredAction: PropTypes.func,
+  depositCustomAmountAction: PropTypes.func,
+  withdrawFiftyAction: PropTypes.func,
+  withdrawHundredAction: PropTypes.func,
+  withdrawCustomAmountAction: PropTypes.func,
+  convertCurrencyThunk: PropTypes.func,
 };
 
-const mapDispatchToProps = (dispatch) => {
-  console.log('dispatch in mapDispatchToProps: ', dispatch);
-
-  return {
-    depositFiftyAction() {
-      dispatch(depositFiftyActionCreator());
-    },
-    depositHundredAction() {
-      dispatch(depositHundredActionCreator());
-    },
-    depositCustomAmountAction(customAmount) {
-      dispatch(depositCustomAmountActionCreator(customAmount));
-    },
-    withdrawFiftyAction() {
-      dispatch(withdrawFiftyActionCreator());
-    },
-    withdrawHundredAction() {
-      dispatch(withdrawHundredActionCreator());
-    },
-    withdrawCustomAmountAction(customAmount) {
-      dispatch(withdrawCustomAmountActionCreator(customAmount));
-    },
-    convertCurrencyThunk(sourceCurrency, targetCurrency) {
-      dispatch(convertCurrencyThunkCreator(sourceCurrency, targetCurrency));
-    },
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Atm);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Atm);
