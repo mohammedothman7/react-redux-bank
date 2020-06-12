@@ -180,12 +180,17 @@ class Atm extends Component {
               </thead>
 
               <tbody>
+<<<<<<< HEAD
                 {transactions.map((transaction) => (
+=======
+                {transactions.map(transaction => (
+>>>>>>> 5ed89311c89019aff3dd047746a730ef0d0f85b4
                   <tr key={transaction.date}>
                     <th>{moment(transaction.date).format('L')}</th>
                     <th>{transaction.type}</th>
                     <th>
                       {transaction.type === 'Deposit'
+<<<<<<< HEAD
                         ? `+${
                             transaction.currency
                           } ${transaction.amount.toFixed(2)}`
@@ -198,6 +203,21 @@ class Atm extends Component {
                     <th>{`${transaction.currency} ${transaction.balance.toFixed(
                       2
                     )}`}</th>
+=======
+                        ? `+${transaction.currency}${transaction.amount.toFixed(
+                            2
+                          )}`
+                        : transaction.type === 'Withdraw'
+                        ? `-${transaction.currency}${transaction.amount.toFixed(
+                            2
+                          )}`
+                        : transaction.amount}
+                    </th>
+                    <th>
+                      {transaction.currency}
+                      {transaction.balance.toFixed(2)}
+                    </th>
+>>>>>>> 5ed89311c89019aff3dd047746a730ef0d0f85b4
                   </tr>
                 ))}
               </tbody>
