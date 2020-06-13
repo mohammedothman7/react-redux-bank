@@ -30,6 +30,28 @@ class Atm extends Component {
     this.handleConvert = this.handleConvert.bind(this);
   }
 
+  componentDidMount() {
+    if (localStorage.reactReduxBank) {
+      try {
+        const cache = localStorage.getItem('reactReduxBank');
+        const { balance, transactions } = JSON.parse(cache);
+
+        this.props.getBalanceAndTransactionsAction(balance, transactions);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }
+
+  componentDidUpdate() {
+    localStorage.setItem(
+      'reactReduxBank',
+      JSON.stringify({
+        balance: this.props.balance,
+        transactions: this.props.transactions,
+      })
+    );
+  }
   handleChange(event) {
     const curCustomAmount = event.target.value;
 
@@ -180,30 +202,12 @@ class Atm extends Component {
               </thead>
 
               <tbody>
-<<<<<<< HEAD
                 {transactions.map((transaction) => (
-=======
-                {transactions.map(transaction => (
->>>>>>> 5ed89311c89019aff3dd047746a730ef0d0f85b4
                   <tr key={transaction.date}>
                     <th>{moment(transaction.date).format('L')}</th>
                     <th>{transaction.type}</th>
                     <th>
                       {transaction.type === 'Deposit'
-<<<<<<< HEAD
-                        ? `+${
-                            transaction.currency
-                          } ${transaction.amount.toFixed(2)}`
-                        : transaction.type === 'Withdraw'
-                        ? `-${
-                            transaction.currency
-                          } ${transaction.amount.toFixed(2)}`
-                        : `${transaction.amount}`}
-                    </th>
-                    <th>{`${transaction.currency} ${transaction.balance.toFixed(
-                      2
-                    )}`}</th>
-=======
                         ? `+${transaction.currency}${transaction.amount.toFixed(
                             2
                           )}`
@@ -217,7 +221,6 @@ class Atm extends Component {
                       {transaction.currency}
                       {transaction.balance.toFixed(2)}
                     </th>
->>>>>>> 5ed89311c89019aff3dd047746a730ef0d0f85b4
                   </tr>
                 ))}
               </tbody>
@@ -258,6 +261,11 @@ const mapDispatchToProps = (dispatch) => ({
   },
   convertCurrencyThunk(sourceCurrency, targetCurrency) {
     dispatch(convertCurrencyThunkCreator(sourceCurrency, targetCurrency));
+  },
+  getBalanceAndTransactionsAction(balance, transactions) {
+    dispatch(
+      this.getBalanceAndTransactionsActionCreator(balance, transactions)
+    );
   },
 });
 
